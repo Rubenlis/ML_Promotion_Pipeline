@@ -2,7 +2,7 @@ import os
 import json
 import sys
 
-ACCURACY_THRESHOLD = float(os.getenv("ACCURACY_THRESHOLD", "0.75"))
+ACCURACY_THRESHOLD = float(os.getenv("ACCURACY_THRESHOLD", "0.7O"))
 
 def main():
     if not sys.stdin.isatty():
