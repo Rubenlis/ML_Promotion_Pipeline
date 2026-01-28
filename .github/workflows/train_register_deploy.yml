@@ -41,7 +41,7 @@ jobs:
         run: |
           echo '${{ steps.train.outputs.result_json }}' | python ml/evaluate.py
 
-      - name: Transition model version to Staging
+      - name: Transition model version to Staging + add tag
         env:
           MLFLOW_TRACKING_URI: ${{ secrets.DAGSHUB_MLFLOW_TRACKING_URI }}
           MLFLOW_TRACKING_TOKEN: ${{ secrets.DAGSHUB_TOKEN }}
@@ -63,14 +63,22 @@ jobs:
           version = str(data["model_version"])
           name = os.environ["MODEL_NAME"]
 
-          MlflowClient().transition_model_version_stage(
+          client = MlflowClient()
+
+          # Set stage to Staging 
+          client.transition_model_version_stage(
               name=name,
               version=version,
               stage="Staging",
               archive_existing_versions=False
           )
-          print(f"Set {name} v{version} to Staging")
+
+          # Add tag
+          client.set_model_version_tag(name=name, version=version, key="deployment", value="staging")
+
+          print(f"Set {name} v{version} to Staging and tagged deployment=staging")
           PY
+
 
   deploy_staging:
     needs: train_register
